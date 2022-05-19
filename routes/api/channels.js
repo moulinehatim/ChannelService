@@ -5,8 +5,7 @@ const myModule = require("../../models/Channel");
 const Channel = myModule.Channel;
 // const UserSchema = myModule.UserSchema;
 // const fetch = require('node-fetch');
-const axios = require('axios');
-
+const axios = require("axios");
 
 //!@route GET api/channels = Get all channels (even by name)
 router.get("/", (req, res) => {
@@ -42,56 +41,48 @@ router.get("/:id", (req, res) => {
 });
 
 //!@route POST api/channels = Create a Post
-router.post("/",  (req, res) => {
+router.post("/", (req, res) => {
   //sned request to straming service
-  
 
   // const options = {
   //   method: 'POST',
   // };
-  
+
   // await fetch('https://containerName/createchannel/'+req.body.owner.username, options)
   //   .then(response => streaminAnswer=response.json())
   //   .then(response => console.log(response))
   //   .catch(err => console.error(err));
 
   axios
-  .post('http://127.0.0.1:5000/createchannel/'+req.body.owner.username)
-  .then(response => {
-    console.log(`statusCode: ${response.status}`);
-    console.log(response);
-   
-    console.log(response)
-    console.log("yyyyyyyyyyyyy");
-    if(response.statusText == 'OK'){
-      
-      const newChannel = new Channel({
-        //_id is set by default
-        name: req.body.name,
-        description: req.body.description,
-        profilePictureURL: "test", //todo req.body.profilePictureURL,
-        owner: req.body.owner,
-        ingestEndpoint:response.data['ingestEndpoint'],
-        playbackUrl:response.data['playbackUrl'],
-        streamKey:response.data['streamKey'],
-        subscribersList: [], //Empty when created, req.body.subscribersList,
-        videoList: [], //Empty when created, req.body.videoList,
-        //dateOfCreation is set by default in the model
-      });
-      newChannel.save().then((channel) => res.json(channel));
-    }
-    
-  })
-  .catch(error => {
-    console.error(error);
-  });
+    .post("http://127.0.0.1:5000/createchannel/" + req.body.owner.username)
+    .then((response) => {
+      console.log(`statusCode: ${response.status}`);
+      console.log(response);
+
+      console.log(response);
+      console.log("yyyyyyyyyyyyy");
+      if (response.statusText == "OK") {
+        const newChannel = new Channel({
+          //_id is set by default
+          name: req.body.name,
+          description: req.body.description,
+          profilePictureURL: "test", //todo req.body.profilePictureURL,
+          owner: req.body.owner,
+          ingestEndpoint: response.data["ingestEndpoint"],
+          playbackUrl: response.data["playbackUrl"],
+          streamKey: response.data["streamKey"],
+          subscribersList: [], //Empty when created, req.body.subscribersList,
+          videoList: [], //Empty when created, req.body.videoList,
+          //dateOfCreation is set by default in the model
+        });
+        newChannel.save().then((channel) => res.json(channel));
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
   //todo else
-  
-  // res.setHeader({
-  //   'Access-Control-Allow-Origin': '*'
-  // })
-  
 });
 
 //!@route PUT api/channels/:id = Subscribe & Unsubscribe to a channel
@@ -126,27 +117,32 @@ router.put("/:id", async (req, res) => {
 });
 
 //!@route DELETE api/channels/:id = Delete a channel
-router.delete("/:id", async (req, res) =>  {
-
+router.delete("/:id", (req, res) => {
   //delete in streaming channel first
-  const streamingAnswer = undefined;
 
-  const options = {
-    method: 'DELETE',
-  };
-  
-  await fetch('http://127.0.0.1:5000/deletechannel/'+req.body.owner.username, options)
-    .then(response => streamingAnswer=response.json())
-    .then(response => console.log(response))
-    .catch(err => console.error(err));
+  axios
+    .delete("http://127.0.0.1:5000/deletechannel/" + req.body.owner.username)
+    .then((response) => {
+      console.log(`statusCode: ${response.status}`);
+      console.log(response);
 
-  if(streamingAnswer["isDeleted"]){
-    Channel.findById(req.params.id)
-    .then((channel) => channel.remove().then(() => res.json({ success: true })))
-    .catch((err) => res.status(404).json({ success: false }));
-  }
+      console.log(response);
+      console.log("yyyyyyyyyyyyy");
+      if (response.statusText == "OK") {
+        if (streamingAnswer.data["isDeleted"]) {
+          Channel.findById(req.params.id)
+            .then((channel) =>
+              channel.remove().then(() => res.json({ success: true }))
+            )
+            .catch((err) => res.status(404).json({ success: false }));
+        }
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
   //todo else
-  
 });
 
 module.exports = router;

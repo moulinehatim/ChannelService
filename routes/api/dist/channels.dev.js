@@ -1,7 +1,5 @@
 "use strict";
 
-function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
-
 var express = require("express");
 
 var router = express.Router(); // Item model
@@ -11,7 +9,7 @@ var myModule = require("../../models/Channel");
 var Channel = myModule.Channel; // const UserSchema = myModule.UserSchema;
 // const fetch = require('node-fetch');
 
-var axios = require('axios'); //!@route GET api/channels = Get all channels (even by name)
+var axios = require("axios"); //!@route GET api/channels = Get all channels (even by name)
 
 
 router.get("/", function (req, res) {
@@ -51,72 +49,52 @@ router.get("/:id", function (req, res) {
   });
 }); //!@route POST api/channels = Create a Post
 
-router.post("/", function _callee(req, res) {
-  var streaminAnswer, _newChannel;
+router.post("/", function (req, res) {
+  //sned request to straming service
+  // const options = {
+  //   method: 'POST',
+  // };
+  // await fetch('https://containerName/createchannel/'+req.body.owner.username, options)
+  //   .then(response => streaminAnswer=response.json())
+  //   .then(response => console.log(response))
+  //   .catch(err => console.error(err));
+  axios.post("http://127.0.0.1:5000/createchannel/" + req.body.owner.username).then(function (response) {
+    console.log("statusCode: ".concat(response.status));
+    console.log(response);
+    console.log(response);
+    console.log("yyyyyyyyyyyyy");
 
+    if (response.statusText == "OK") {
+      var newChannel = new Channel({
+        //_id is set by default
+        name: req.body.name,
+        description: req.body.description,
+        profilePictureURL: "test",
+        //todo req.body.profilePictureURL,
+        owner: req.body.owner,
+        ingestEndpoint: response.data["ingestEndpoint"],
+        playbackUrl: response.data["playbackUrl"],
+        streamKey: response.data["streamKey"],
+        subscribersList: [],
+        //Empty when created, req.body.subscribersList,
+        videoList: [] //Empty when created, req.body.videoList,
+        //dateOfCreation is set by default in the model
+
+      });
+      newChannel.save().then(function (channel) {
+        return res.json(channel);
+      });
+    }
+  })["catch"](function (error) {
+    console.error(error);
+  }); //todo else
+}); //!@route PUT api/channels/:id = Subscribe & Unsubscribe to a channel
+
+router.put("/:id", function _callee(req, res) {
+  var id, isSubscribing, user, doc;
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
-        case 0:
-          //sned request to straming service
-          streaminAnswer = undefined; // const options = {
-          //   method: 'POST',
-          // };
-          // await fetch('https://containerName/createchannel/'+req.body.owner.username, options)
-          //   .then(response => streaminAnswer=response.json())
-          //   .then(response => console.log(response))
-          //   .catch(err => console.error(err));
-
-          _context.next = 3;
-          return regeneratorRuntime.awrap(axios.post('https://containerName/createchannel/' + req.body.owner.username).then(function (res) {
-            console.log("statusCode: ".concat(res.status));
-            console.log(res);
-            streaminAnswer = (_readOnlyError("streaminAnswer"), res);
-          })["catch"](function (error) {
-            console.error(error);
-          }));
-
-        case 3:
-          if (streaminAnswer.ok) {
-            _newChannel = new Channel({
-              //_id is set by default
-              name: req.body.name,
-              description: req.body.description,
-              profilePictureURL: "test",
-              //todo req.body.profilePictureURL,
-              owner: req.body.owner,
-              ingestEndpoint: streaminAnswer['ingestEndpoint'],
-              playbackUrl: streaminAnswer.playbackUrl,
-              streamKey: streaminAnswer.streamKey,
-              subscribersList: [],
-              //Empty when created, req.body.subscribersList,
-              videoList: [] //Empty when created, req.body.videoList,
-              //dateOfCreation is set by default in the model
-
-            });
-          } //todo else
-          // res.setHeader({
-          //   'Access-Control-Allow-Origin': '*'
-          // })
-
-
-          newChannel.save().then(function (channel) {
-            return res.json(channel);
-          });
-
-        case 5:
-        case "end":
-          return _context.stop();
-      }
-    }
-  });
-}); //!@route PUT api/channels/:id = Subscribe & Unsubscribe to a channel
-
-router.put("/:id", function _callee2(req, res) {
-  var id, isSubscribing, user, doc;
-  return regeneratorRuntime.async(function _callee2$(_context2) {
-    while (1) {
-      switch (_context2.prev = _context2.next) {
         case 0:
           //id of the channel
           id = req.params.id;
@@ -127,13 +105,13 @@ router.put("/:id", function _callee2(req, res) {
             name: req.body.userName,
             email: req.body.userEmail
           };
-          _context2.next = 6;
+          _context.next = 6;
           return regeneratorRuntime.awrap(Channel.findOne({
             _id: id
           }));
 
         case 6:
-          doc = _context2.sent;
+          doc = _context.sent;
 
           if (isSubscribing) {
             doc.subscribersList.push(user);
@@ -157,53 +135,37 @@ router.put("/:id", function _callee2(req, res) {
 
         case 9:
         case "end":
-          return _context2.stop();
+          return _context.stop();
       }
     }
   });
 }); //!@route DELETE api/channels/:id = Delete a channel
 
-router["delete"]("/:id", function _callee3(req, res) {
-  var streamingAnswer, options;
-  return regeneratorRuntime.async(function _callee3$(_context3) {
-    while (1) {
-      switch (_context3.prev = _context3.next) {
-        case 0:
-          //delete in streaming channel first
-          streamingAnswer = undefined;
-          options = {
-            method: 'DELETE'
-          };
-          _context3.next = 4;
-          return regeneratorRuntime.awrap(fetch('https://containerName/deletechannel/' + req.body.owner.username, options).then(function (response) {
-            return streamingAnswer = (_readOnlyError("streamingAnswer"), response.json());
-          }).then(function (response) {
-            return console.log(response);
-          })["catch"](function (err) {
-            return console.error(err);
-          }));
+router["delete"]("/:id", function (req, res) {
+  //delete in streaming channel first
+  axios["delete"]("http://127.0.0.1:5000/deletechannel/" + req.body.owner.username).then(function (response) {
+    console.log("statusCode: ".concat(response.status));
+    console.log(response);
+    console.log(response);
+    console.log("yyyyyyyyyyyyy");
 
-        case 4:
-          if (streamingAnswer["isDeleted"]) {
-            Channel.findById(req.params.id).then(function (channel) {
-              return channel.remove().then(function () {
-                return res.json({
-                  success: true
-                });
-              });
-            })["catch"](function (err) {
-              return res.status(404).json({
-                success: false
-              });
+    if (response.statusText == "OK") {
+      if (streamingAnswer.data["isDeleted"]) {
+        Channel.findById(req.params.id).then(function (channel) {
+          return channel.remove().then(function () {
+            return res.json({
+              success: true
             });
-          } //todo else
-
-
-        case 5:
-        case "end":
-          return _context3.stop();
+          });
+        })["catch"](function (err) {
+          return res.status(404).json({
+            success: false
+          });
+        });
       }
     }
-  });
+  })["catch"](function (error) {
+    console.error(error);
+  }); //todo else
 });
 module.exports = router;
