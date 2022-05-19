@@ -4,6 +4,7 @@ const router = express.Router();
 const myModule = require("../../models/Channel");
 const Channel = myModule.Channel;
 // const UserSchema = myModule.UserSchema;
+const fetch = require('node-fetch');
 
 //!@route GET api/channels = Get all channels (even by name)
 router.get("/", (req, res) => {

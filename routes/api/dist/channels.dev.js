@@ -9,7 +9,9 @@ var router = express.Router(); // Item model
 var myModule = require("../../models/Channel");
 
 var Channel = myModule.Channel; // const UserSchema = myModule.UserSchema;
-//!@route GET api/channels = Get all channels (even by name)
+
+var fetch = require('node-fetch'); //!@route GET api/channels = Get all channels (even by name)
+
 
 router.get("/", function (req, res) {
   var name = req.body.name; //get all
