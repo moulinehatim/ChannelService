@@ -120,8 +120,13 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", (req, res) => {
   //delete in streaming channel first
 
+  const headers = { 
+    'role': 'user',
+    'username': "hatimmoydydtf"
+};
+
   axios
-    .delete("http://127.0.0.1:5000/deletechannel/" + req.body.owner.username)
+    .delete("http://127.0.0.1:5000/deletechannel/" + req.body.owner.username, { headers })
     .then((response) => {
       console.log(`statusCode: ${response.status}`);
       console.log(response);
