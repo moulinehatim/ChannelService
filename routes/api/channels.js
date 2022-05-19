@@ -42,9 +42,9 @@ router.get("/:id", (req, res) => {
 });
 
 //!@route POST api/channels = Create a Post
-router.post("/", async (req, res) => {
+router.post("/",  (req, res) => {
   //sned request to straming service
-  const streaminAnswer = undefined;
+  
 
   // const options = {
   //   method: 'POST',
@@ -55,37 +55,43 @@ router.post("/", async (req, res) => {
   //   .then(response => console.log(response))
   //   .catch(err => console.error(err));
 
-    await axios
-  .post('https://containerName/createchannel/'+req.body.owner.username)
-  .then(res => {
-    console.log(`statusCode: ${res.status}`);
-    console.log(res);
-    streaminAnswer=res
+  axios
+  .post('http://127.0.0.1:5000/createchannel/'+req.body.owner.username)
+  .then(response => {
+    console.log(`statusCode: ${response.status}`);
+    console.log(response);
+   
+    console.log(response)
+    console.log("yyyyyyyyyyyyy");
+    if(response.statusText == 'OK'){
+      
+      const newChannel = new Channel({
+        //_id is set by default
+        name: req.body.name,
+        description: req.body.description,
+        profilePictureURL: "test", //todo req.body.profilePictureURL,
+        owner: req.body.owner,
+        ingestEndpoint:response.data['ingestEndpoint'],
+        playbackUrl:response.data['playbackUrl'],
+        streamKey:response.data['streamKey'],
+        subscribersList: [], //Empty when created, req.body.subscribersList,
+        videoList: [], //Empty when created, req.body.videoList,
+        //dateOfCreation is set by default in the model
+      });
+      newChannel.save().then((channel) => res.json(channel));
+    }
+    
   })
   .catch(error => {
     console.error(error);
   });
 
-  if(streaminAnswer.ok){
-    const newChannel = new Channel({
-      //_id is set by default
-      name: req.body.name,
-      description: req.body.description,
-      profilePictureURL: "test", //todo req.body.profilePictureURL,
-      owner: req.body.owner,
-      ingestEndpoint:streaminAnswer['ingestEndpoint'],
-      playbackUrl:streaminAnswer.playbackUrl,
-      streamKey:streaminAnswer.streamKey,
-      subscribersList: [], //Empty when created, req.body.subscribersList,
-      videoList: [], //Empty when created, req.body.videoList,
-      //dateOfCreation is set by default in the model
-    });
-  } //todo else
+  //todo else
   
   // res.setHeader({
   //   'Access-Control-Allow-Origin': '*'
   // })
-  newChannel.save().then((channel) => res.json(channel));
+  
 });
 
 //!@route PUT api/channels/:id = Subscribe & Unsubscribe to a channel
@@ -129,7 +135,7 @@ router.delete("/:id", async (req, res) =>  {
     method: 'DELETE',
   };
   
-  await fetch('https://containerName/deletechannel/'+req.body.owner.username, options)
+  await fetch('http://127.0.0.1:5000/deletechannel/'+req.body.owner.username, options)
     .then(response => streamingAnswer=response.json())
     .then(response => console.log(response))
     .catch(err => console.error(err));
