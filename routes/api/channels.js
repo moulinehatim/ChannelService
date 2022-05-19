@@ -4,7 +4,9 @@ const router = express.Router();
 const myModule = require("../../models/Channel");
 const Channel = myModule.Channel;
 // const UserSchema = myModule.UserSchema;
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
+const axios = require('axios');
+
 
 //!@route GET api/channels = Get all channels (even by name)
 router.get("/", (req, res) => {
@@ -44,14 +46,25 @@ router.post("/", async (req, res) => {
   //sned request to straming service
   const streaminAnswer = undefined;
 
-  const options = {
-    method: 'POST',
-  };
+  // const options = {
+  //   method: 'POST',
+  // };
   
-  await fetch('https://containerName/createchannel/'+req.body.owner.username, options)
-    .then(response => streaminAnswer=response.json())
-    .then(response => console.log(response))
-    .catch(err => console.error(err));
+  // await fetch('https://containerName/createchannel/'+req.body.owner.username, options)
+  //   .then(response => streaminAnswer=response.json())
+  //   .then(response => console.log(response))
+  //   .catch(err => console.error(err));
+
+    await axios
+  .post('https://containerName/createchannel/'+req.body.owner.username)
+  .then(res => {
+    console.log(`statusCode: ${res.status}`);
+    console.log(res);
+    streaminAnswer=res
+  })
+  .catch(error => {
+    console.error(error);
+  });
 
   if(streaminAnswer.ok){
     const newChannel = new Channel({

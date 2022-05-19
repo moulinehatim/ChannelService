@@ -9,8 +9,9 @@ var router = express.Router(); // Item model
 var myModule = require("../../models/Channel");
 
 var Channel = myModule.Channel; // const UserSchema = myModule.UserSchema;
+// const fetch = require('node-fetch');
 
-var fetch = require('node-fetch'); //!@route GET api/channels = Get all channels (even by name)
+var axios = require('axios'); //!@route GET api/channels = Get all channels (even by name)
 
 
 router.get("/", function (req, res) {
@@ -51,27 +52,31 @@ router.get("/:id", function (req, res) {
 }); //!@route POST api/channels = Create a Post
 
 router.post("/", function _callee(req, res) {
-  var streaminAnswer, options, _newChannel;
+  var streaminAnswer, _newChannel;
 
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
           //sned request to straming service
-          streaminAnswer = undefined;
-          options = {
-            method: 'POST'
-          };
-          _context.next = 4;
-          return regeneratorRuntime.awrap(fetch('https://containerName/createchannel/' + req.body.owner.username, options).then(function (response) {
-            return streaminAnswer = (_readOnlyError("streaminAnswer"), response.json());
-          }).then(function (response) {
-            return console.log(response);
-          })["catch"](function (err) {
-            return console.error(err);
+          streaminAnswer = undefined; // const options = {
+          //   method: 'POST',
+          // };
+          // await fetch('https://containerName/createchannel/'+req.body.owner.username, options)
+          //   .then(response => streaminAnswer=response.json())
+          //   .then(response => console.log(response))
+          //   .catch(err => console.error(err));
+
+          _context.next = 3;
+          return regeneratorRuntime.awrap(axios.post('https://containerName/createchannel/' + req.body.owner.username).then(function (res) {
+            console.log("statusCode: ".concat(res.status));
+            console.log(res);
+            streaminAnswer = (_readOnlyError("streaminAnswer"), res);
+          })["catch"](function (error) {
+            console.error(error);
           }));
 
-        case 4:
+        case 3:
           if (streaminAnswer.ok) {
             _newChannel = new Channel({
               //_id is set by default
@@ -99,7 +104,7 @@ router.post("/", function _callee(req, res) {
             return res.json(channel);
           });
 
-        case 6:
+        case 5:
         case "end":
           return _context.stop();
       }
