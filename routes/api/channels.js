@@ -234,13 +234,42 @@ router.delete("/:id", (req, res) => {
               })
               .catch((err) => res.status(404).json({ success: false }));
           }
-        }else{
-            res.status(500).json("Internal Server Error");          
+        } else {
+          res.status(500).json("Internal Server Error");
         }
       })
       .catch((error) => {
         console.error(error);
       });
+  } else {
+    res.status(401).json("Unauthorized");
+  }
+});
+
+//!@route PUT api/channels/modify/:id
+router.put("/modify/:id", async (req, res) => {
+  const body = tokenBody(req);
+  if (body["success"]) {
+    //id of the channel
+    const id = req.params.id;
+
+    const doc = await Channel.findOne({ _id: id });
+
+    if (body["username"] == channel.owner.username) {
+      doc.name = req.body.name == undefined ? doc.name : req.body.name;
+      doc.description =
+        req.body.description == undefined
+          ? doc.description
+          : req.body.description;
+      doc
+        .save()
+        .then((channel) => res.json(channel))
+        .catch((error) => {
+          res.status(500).json("Internal Server Error");
+        });
+    } else {
+      res.status(403).json("Forbidden");
+    }
   } else {
     res.status(401).json("Unauthorized");
   }

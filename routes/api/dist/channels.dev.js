@@ -273,5 +273,54 @@ router["delete"]("/:id", function (req, res) {
   } else {
     res.status(401).json("Unauthorized");
   }
+}); //!@route PUT api/channels/modify/:id
+
+router.put("/modify/:id", function _callee2(req, res) {
+  var body, id, doc;
+  return regeneratorRuntime.async(function _callee2$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          body = tokenBody(req);
+
+          if (!body["success"]) {
+            _context2.next = 9;
+            break;
+          }
+
+          //id of the channel
+          id = req.params.id;
+          _context2.next = 5;
+          return regeneratorRuntime.awrap(Channel.findOne({
+            _id: id
+          }));
+
+        case 5:
+          doc = _context2.sent;
+
+          if (body["username"] == channel.owner.username) {
+            doc.name = req.body.name == undefined ? doc.name : req.body.name;
+            doc.description = req.body.description == undefined ? doc.description : req.body.description;
+            doc.save().then(function (channel) {
+              return res.json(channel);
+            })["catch"](function (error) {
+              res.status(500).json("Internal Server Error");
+            });
+          } else {
+            res.status(403).json("Forbidden");
+          }
+
+          _context2.next = 10;
+          break;
+
+        case 9:
+          res.status(401).json("Unauthorized");
+
+        case 10:
+        case "end":
+          return _context2.stop();
+      }
+    }
+  });
 });
 module.exports = router;
