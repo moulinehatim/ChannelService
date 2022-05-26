@@ -246,7 +246,7 @@ router["delete"]("/:id", function (req, res) {
       // console.log(response);
       // console.log("yyyyyyyyyyyyy");
       if (response.statusText == "OK") {
-        if (streamingAnswer.data["isDeleted"]) {
+        if (response.data["isDeleted"]) {
           Channel.findById(req.params.id).then(function (channel) {
             if (body["username"] == channel.owner.username) {
               channel.remove().then(function () {
