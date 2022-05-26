@@ -250,9 +250,9 @@ router["delete"]("/:id", function (req, res) {
           Channel.findById(req.params.id).then(function (channel) {
             console.log("###################");
             console.log(body["username"]);
-            console.log(channel.owner.username);
+            console.log(channel.owner["username"]);
 
-            if (body["username"] == channel.owner.username) {
+            if (body["username"] == channel.owner["username"]) {
               channel.remove().then(function () {
                 return res.json({
                   success: true

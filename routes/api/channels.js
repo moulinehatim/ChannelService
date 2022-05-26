@@ -223,8 +223,8 @@ router.delete("/:id", (req, res) => {
               .then((channel) => {
                 console.log("###################");
                 console.log(body["username"]);
-                console.log(channel.owner.username);
-                if (body["username"] == channel.owner.username) {
+                console.log(channel.owner["username"]);
+                if (body["username"] == channel.owner["username"]) {
                   channel
                     .remove()
                     .then(() => res.json({ success: true }))
