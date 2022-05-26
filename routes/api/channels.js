@@ -113,7 +113,7 @@ router.post("/", (req, res) => {
     //send request to straming service
     //todo ........check if undefined
     axios
-      .post("http://127.0.0.1:5000/createchannel/" + body["username"])
+      .post("http://127.0.0.1:5000/createchannel/" + body["username"],req.headers)
       .then((response) => {
         // console.log(`statusCode: ${response.status}`);
         // console.log(response);
@@ -203,14 +203,13 @@ router.delete("/:id", (req, res) => {
     //   role: "user",
     //   username: "hatimmoydydtf",
     // };
-
+    headers=req.headers
     axios
       .delete(
         "http://127.0.0.1:5000/deletechannel/" + req.body.owner.username,
-        // {
-        //   headers,
-        req.headers
-        // }
+        {
+          headers,
+        }
       )
       .then((response) => {
         // console.log(`statusCode: ${response.status}`);
