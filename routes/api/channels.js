@@ -197,66 +197,57 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", (req, res) => {
   //delete in streaming channel first
 
-  //!
-  Channel.findById(req.params.id)
+  const body = tokenBody(req);
+  if (body["success"]) {
+    // const headers = {
+    //   role: "user",
+    //   username: "hatimmoydydtf",
+    // };
+    headers=req.headers
+    axios
+      .delete(
+        "http://127.0.0.1:5000/deletechannel/" + req.body.owner.username,
+        {
+          headers,
+        }
+      )
+      .then((response) => {
+        // console.log(`statusCode: ${response.status}`);
+        // console.log(response);
+
+        // console.log(response);
+        // console.log("yyyyyyyyyyyyy");
+        if (response.statusText == "OK") {
+          if (response.data["isDeleted"]) {
+            Channel.findById(req.params.id)
               .then((channel) => {
-                
-                console.log(channel.owner.get("username"));
-                
+                // console.log("###################");
+                // console.log(body["username"]);
+                // console.log(channel.owner["username"]);
+                if (body["username"] == channel.owner.get("username")) {
+                  channel
+                    .remove()
+                    .then(() => res.json({ success: true }))
+                    .catch((error) => {
+                      res.status(500).json("Internal Server Error");
+                    });
+                } else {
+                  res.status(403).json("Forbidden");
+                }
               })
-  //!
-
-  // const body = tokenBody(req);
-  // if (body["success"]) {
-  //   // const headers = {
-  //   //   role: "user",
-  //   //   username: "hatimmoydydtf",
-  //   // };
-  //   headers=req.headers
-  //   axios
-  //     .delete(
-  //       "http://127.0.0.1:5000/deletechannel/" + req.body.owner.username,
-  //       {
-  //         headers,
-  //       }
-  //     )
-  //     .then((response) => {
-  //       // console.log(`statusCode: ${response.status}`);
-  //       // console.log(response);
-
-  //       // console.log(response);
-  //       // console.log("yyyyyyyyyyyyy");
-  //       if (response.statusText == "OK") {
-  //         if (response.data["isDeleted"]) {
-  //           Channel.findById(req.params.id)
-  //             .then((channel) => {
-  //               console.log("###################");
-  //               console.log(body["username"]);
-  //               console.log(channel.owner["username"]);
-  //               if (body["username"] == channel.owner["username"]) {
-  //                 channel
-  //                   .remove()
-  //                   .then(() => res.json({ success: true }))
-  //                   .catch((error) => {
-  //                     res.status(500).json("Internal Server Error");
-  //                   });
-  //               } else {
-  //                 res.status(403).json("Forbidden");
-  //               }
-  //             })
-  //             .catch((err) => res.status(404).json({ success: false }));
-  //         }
-  //       } else {
-  //         res.status(500).json("Internal Server Error");
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       // console.error(error);
-  //       res.status(500).json("Internal Server Error");
-  //     });
-  // } else {
-  //   res.status(401).json("Unauthorized");
-  // }
+              .catch((err) => res.status(404).json({ success: false }));
+          }
+        } else {
+          res.status(500).json("Internal Server Error");
+        }
+      })
+      .catch((error) => {
+        // console.error(error);
+        res.status(500).json("Internal Server Error");
+      });
+  } else {
+    res.status(401).json("Unauthorized");
+  }
 });
 
 //!@route PUT api/channels/modify/:id
