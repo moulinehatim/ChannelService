@@ -112,7 +112,7 @@ router.post("/", (req, res) => {
   if (body["success"]) {
     //send request to straming service
     axios
-      .post("http://127.0.0.1:5000/createchannel/" + req.body.owner.username)
+      .post("http://127.0.0.1:5000/createchannel/" + body["username"])
       .then((response) => {
         // console.log(`statusCode: ${response.status}`);
         // console.log(response);
