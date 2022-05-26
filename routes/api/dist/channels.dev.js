@@ -46,7 +46,7 @@ var decode = function decode(bearerToken) {
 
 var tokenBody = function tokenBody(req) {
   var authorization = req.headers.authorization;
-  var token = authorization.split(" ")[1];
+  var token = authorization == undefined ? "1" : authorization.split(" ")[1];
   var Body = decode(token);
   return Body;
 }; //! test

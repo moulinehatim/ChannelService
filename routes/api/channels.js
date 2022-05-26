@@ -36,7 +36,7 @@ const decode = (bearerToken) => {
 
 const tokenBody = (req) => {
   const authorization = req.headers.authorization;
-  const token = authorization.split(" ")[1];
+  const token = authorization == undefined ? "1" : authorization.split(" ")[1];
   const Body = decode(token);
   return Body;
 };
