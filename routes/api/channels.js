@@ -111,6 +111,7 @@ router.post("/", (req, res) => {
   const body = tokenBody(req);
   if (body["success"]) {
     //send request to straming service
+    //todo ........check if undefined
     axios
       .post("http://127.0.0.1:5000/createchannel/" + body["username"])
       .then((response) => {
@@ -239,7 +240,8 @@ router.delete("/:id", (req, res) => {
         }
       })
       .catch((error) => {
-        console.error(error);
+        // console.error(error);
+        res.status(500).json("Internal Server Error");
       });
   } else {
     res.status(401).json("Unauthorized");

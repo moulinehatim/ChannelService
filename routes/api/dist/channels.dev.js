@@ -123,6 +123,7 @@ router.post("/", function (req, res) {
 
   if (body["success"]) {
     //send request to straming service
+    //todo ........check if undefined
     axios.post("http://127.0.0.1:5000/createchannel/" + body["username"]).then(function (response) {
       // console.log(`statusCode: ${response.status}`);
       // console.log(response);
@@ -268,7 +269,8 @@ router["delete"]("/:id", function (req, res) {
         res.status(500).json("Internal Server Error");
       }
     })["catch"](function (error) {
-      console.error(error);
+      // console.error(error);
+      res.status(500).json("Internal Server Error");
     });
   } else {
     res.status(401).json("Unauthorized");
