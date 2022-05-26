@@ -259,7 +259,7 @@ router.put("/modify/:id", async (req, res) => {
 
     const doc = await Channel.findOne({ _id: id });
 
-    if (body["username"] == channel.owner.username) {
+    if (body["username"] == channel.owner.get("username")) {
       doc.name = req.body.name == undefined ? doc.name : req.body.name;
       doc.description =
         req.body.description == undefined

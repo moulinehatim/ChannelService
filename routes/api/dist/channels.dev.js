@@ -303,7 +303,7 @@ router.put("/modify/:id", function _callee2(req, res) {
         case 5:
           doc = _context2.sent;
 
-          if (body["username"] == channel.owner.username) {
+          if (body["username"] == channel.owner.get("username")) {
             doc.name = req.body.name == undefined ? doc.name : req.body.name;
             doc.description = req.body.description == undefined ? doc.description : req.body.description;
             doc.save().then(function (channel) {
